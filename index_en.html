@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Network Analysis of Dream of the Red Chamber - Xue Baochai Study</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px 20px;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            color: #764ba2;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .section h2 {
+            color: #764ba2;
+            font-size: 2em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .section h3 {
+            color: #667eea;
+            font-size: 1.5em;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        .section p, .section li {
+            font-size: 1.1em;
+            line-height: 1.8;
+            margin-bottom: 10px;
+        }
+
+        .section ul {
+            margin-left: 30px;
+            margin-bottom: 20px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .highlight-box h3 {
+            color: white;
+            margin-top: 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-card .number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .label {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .algorithm-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .algorithm-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .algorithm-card h4 {
+            color: #764ba2;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .algorithm-card .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .status.effective {
+            background: #28a745;
+            color: white;
+        }
+
+        .status.limited {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .image-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .image-container p {
+            margin-top: 10px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .chapter-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .chapter-item {
+            background: #667eea;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        table th, table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        table th {
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+        }
+
+        table tr:hover {
+            background: #f5f5f5;
+        }
+
+        .workflow {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .workflow-step {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+        }
+
+        .workflow-step .step-number {
+            background: #667eea;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+
+        footer {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px;
+            margin-top: 30px;
+            color: #666;
+        }
+
+        .data-source {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #2196F3;
+            margin: 15px 0;
+        }
+
+        .data-source strong {
+            color: #2196F3;
+        }
+
+        a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .algorithm-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 Social Network Analysis of Dream of the Red Chamber</h1>
+            <p>Research Subject: Xue Baochai (薛寶釵) | Network Analysis Based on Selected 20 Chapters</p>
+            <p style="font-size: 0.9em; color: #999; margin-top: 10px;">
+                CHC5904 Digital Studies of Chinese Culture - Assignment 2
+            </p>
+        </header>
+
+        <!-- Project Overview -->
+        <section class="section">
+            <h2>📊 Project Overview</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="number">20</div>
+                    <div class="label">Chapters Analyzed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">19</div>
+                    <div class="label">Interacting Characters</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">316</div>
+                    <div class="label">Total Interactions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">16</div>
+                    <div class="label">Analysis Algorithms</div>
+                </div>
+            </div>
+            
+            <div class="highlight-box">
+                <h3>Key Findings</h3>
+                <p>Xue Baochai holds an absolutely central position in the social network, with a degree centrality of 1.0 and a Hub score of 1.0, making her a perfect hub node. She has direct interactions with 19 characters, totaling 316 interactions, with the most frequent interactions being with Jia Baoyu (59 times) and Lin Daiyu (58 times).</p>
+            </div>
+        </section>
+
+        <!-- Data Source -->
+        <section class="section">
+            <h2>📥 Data Source and Preparation Process</h2>
+            
+            <h3>1. Data Source</h3>
+            <div class="data-source">
+                <p><strong>Original Text Source:</strong> <a href="https://ctext.org/hongloumeng" target="_blank">ctext.org</a></p>
+                <p>All text data comes from the Chinese Text Project (ctext.org) electronic version of "Dream of the Red Chamber", ensuring the authority and accuracy of the data.</p>
+            </div>
+
+            <h3>2. Chapter Selection</h3>
+            <p>To ensure the depth and quality of analysis, we adopted a chapter selection method based on Xue Baochai's frequency of appearance:</p>
+            <ul>
+                <li><strong>Analysis Range:</strong> Chapters 1-50</li>
+                <li><strong>Selection Criteria:</strong> Count the frequency of Xue Baochai's appearance in each chapter (including all name variants)</li>
+                <li><strong>Selection Result:</strong> Selected the 20 chapters with the highest frequency</li>
+            </ul>
+
+            <h3>Selected 20 Chapters</h3>
+            <div class="chapter-list">
+                <div class="chapter-item">Ch. 7</div>
+                <div class="chapter-item">Ch. 8</div>
+                <div class="chapter-item">Ch. 22</div>
+                <div class="chapter-item">Ch. 25</div>
+                <div class="chapter-item">Ch. 27</div>
+                <div class="chapter-item">Ch. 28</div>
+                <div class="chapter-item">Ch. 29</div>
+                <div class="chapter-item">Ch. 30</div>
+                <div class="chapter-item">Ch. 31</div>
+                <div class="chapter-item">Ch. 32</div>
+                <div class="chapter-item">Ch. 34</div>
+                <div class="chapter-item">Ch. 35</div>
+                <div class="chapter-item">Ch. 36</div>
+                <div class="chapter-item">Ch. 37</div>
+                <div class="chapter-item">Ch. 38</div>
+                <div class="chapter-item">Ch. 42</div>
+                <div class="chapter-item">Ch. 45</div>
+                <div class="chapter-item">Ch. 48</div>
+                <div class="chapter-item">Ch. 49</div>
+                <div class="chapter-item">Ch. 50</div>
+            </div>
+            <p style="margin-top: 15px;"><strong>Total Mentions:</strong> 453 times | <strong>Average per Chapter:</strong> 22.6 times</p>
+
+            <h3>3. Data Preprocessing Workflow</h3>
+            <div class="workflow">
+                <div class="workflow-step">
+                    <div class="step-number">1</div>
+                    <div>
+                        <strong>Text Cleaning</strong>
+                        <p>Remove chapter titles, unify formats, handle encoding issues</p>
+                    </div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-number">2</div>
+                    <div>
+                        <strong>Character Name Standardization</strong>
+                        <p>Build character name dictionary, handle aliases, titles and variants (28 characters, 87 variants)</p>
+                    </div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-number">3</div>
+                    <div>
+                        <strong>Interaction Identification</strong>
+                        <p>Based on sentence-level co-occurrence analysis, identify three types of interactions: dialogue, behavior, and co-occurrence</p>
+                    </div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-number">4</div>
+                    <div>
+                        <strong>Data Validation</strong>
+                        <p>Manual close reading verification, supplement missing interactions, ensure data quality</p>
+                    </div>
+                </div>
+            </div>
+
+            <h3>4. Data Statistics</h3>
+            <table>
+                <tr>
+                    <th>Metric</th>
+                    <th>Value</th>
+                </tr>
+                <tr>
+                    <td>Total Characters</td>
+                    <td>143,605 characters</td>
+                </tr>
+                <tr>
+                    <td>Cleaned Text Files</td>
+                    <td>20 files</td>
+                </tr>
+                <tr>
+                    <td>Number of Characters</td>
+                    <td>28 characters</td>
+                </tr>
+                <tr>
+                    <td>Character Name Variants</td>
+                    <td>87 variants</td>
+                </tr>
+                <tr>
+                    <td>Identified Interactions</td>
+                    <td>19 relationships</td>
+                </tr>
+                <tr>
+                    <td>Total Interactions</td>
+                    <td>316 times</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- Network Analysis Algorithms -->
+        <section class="section">
+            <h2>🔬 Network Analysis Algorithms</h2>
+            <p>This study uses 16 diverse network analysis algorithms to comprehensively analyze Xue Baochai's social network characteristics from multiple perspectives.</p>
+
+            <h3>Basic Centrality Algorithms (8 types)</h3>
+            <div class="algorithm-grid">
+                <div class="algorithm-card">
+                    <h4>1. Degree Centrality</h4>
+                    <p>Measures the number of direct connections. Xue Baochai's degree centrality is 1.0, the highest among all characters.</p>
+                    <span class="status effective">Highly Effective</span>
+                </div>
+                <div class="algorithm-card">
+                    <h4>2. In-degree / Out-degree</h4>
+                    <p>Analyzes active/passive roles. Xue Baochai: out-degree=19, in-degree=0, reflecting proactive social characteristics.</p>
+                    <span class="status effective">Highly Effective</span>
+                </div>
+                <div class="algorithm-card">
+                    <h4>3. Weighted Degree</h4>
+                    <p>Considers interaction frequency. Xue Baochai's weighted degree is 316, reflecting interaction intensity.</p>
+                    <span class="status effective">Highly Effective</span>
+                </div>
+                <div class="algorithm-card">
+                    <h4>4. Betweenness Centrality</h4>
+                    <p>Measures importance as a "bridge". Value is 0 due to star network structure.</p>
+                    <span class="status limited">Structure Limited</span>
+                </div>
+                <div class="algorithm-card">
+                    <h4>5. Closeness Centrality</h4>
+                    <p>Measures average distance to other nodes. Limited by directed star structure.</p>
+                    <span class="status limited">Structure Limited</span>
+                </div>
+                <div class="algorithm-card">
+                    <h4>6. Eigenvector Centrality</h4>
+                    <p>Considers importance of connected nodes. Low discrimination due to simple network structure.</p>
+                    <span class="status limited">Structure Limited</span>
+                </div>
+                <div class="algorithm-card">
+                    <h4>7. PageRank</h4>
+                    <p>Google search engine algorithm measuring node importance. Xue Baochai's value: 0.0480.</p>
+                    <span class="status effective">Moderately Effective</span>
+                </div>
+                <div class="algorithm-card">
+                    <h4>8. Clustering Coefficient</h4>
+                    <p>Measures connection density among neighbors. Value is 0 due to star structure.</p>
+                    <span class="status limited">Structure Limited</span>
+                </div>
+            </div>
+
+            <h3>Advanced Algorithms (8 types)</h3>
+            <div class="algorithm-grid">
+                <div class="algorithm-card">
+                    <h4>9. Katz Centrality</h4>
+                    <p>Considers all paths. Xue Baochai's value: 0.517527, confirming central position.</p>
+                    <span class="status effective">Highly Effective</span>
+                </div>
+                <div class="algorithm-card">
+                    <h4>10. Harmonic Centrality</h4>
+                    <p>Distance centrality using harmonic mean. Limited by network structure.</p>
+                    <span class="status limited">Structure Limited</span>
+                </div>
+                <div class="algorithm-card">
+                    <h4>11. HITS Algorithm</h4>
+                    <p>Distinguishes Hub and Authority. Xue Baochai's Hub score: 1.0, perfect hub node.</p>
+                    <span class="status effective">Highly Effective</span>
+                </div>
+                <div class="algorithm-card">
+                    <h4>12. Subgraph Centrality</h4>
+                    <p>Based on number of subgraphs participated. Xue Baochai's value: 39.09, reflecting local importance.</p>
+                    <span class="status effective">Highly Effective</span>
+                </div>
+                <div class="algorithm-card">
+                    <h4>13. Core-Periphery Analysis</h4>
+                    <p>Identifies core and peripheral nodes. Xue Baochai's core number: 1, in core layer.</p>
+                    <span class="status effective">Highly Effective</span>
+                </div>
+                <div class="algorithm-card">
+                    <h4>14. Structural Hole Analysis</h4>
+                    <p>Analyzes information control capability. Xue Baochai's constraint: 0.052632, free connections.</p>
+                    <span class="status effective">Highly Effective</span>
+                </div>
+                <div class="algorithm-card">
+                    <h4>15. Community Detection</h4>
+                    <p>Identifies community structures. All nodes in same community due to star structure.</p>
+                    <span class="status limited">Structure Limited</span>
+                </div>
+                <div class="algorithm-card">
+                    <h4>16. Network Properties Analysis</h4>
+                    <p>Analyzes overall network characteristics (density, reciprocity, transitivity, etc.).</p>
+                    <span class="status effective">Highly Effective</span>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <h3>Algorithm Effectiveness Summary</h3>
+                <p><strong>Highly Effective (9 types):</strong> Degree Centrality, In/Out-degree, Weighted Degree, Katz Centrality, HITS, Subgraph Centrality, Core-Periphery, Structural Holes, Network Properties</p>
+                <p><strong>Moderately Effective (1 type):</strong> PageRank</p>
+                <p><strong>Structure Limited (6 types):</strong> Betweenness, Closeness, Eigenvector, Clustering Coefficient, Harmonic Centrality, Community Detection</p>
+            </div>
+        </section>
+
+        <!-- Key Findings -->
+        <section class="section">
+            <h2>🔍 Key Findings</h2>
+            
+            <h3>1. Xue Baochai's Network Position</h3>
+            <ul>
+                <li><strong>Degree Centrality:</strong> 1.0000 (highest, 19 direct connections)</li>
+                <li><strong>Hub Score:</strong> 1.0000 (perfect hub node)</li>
+                <li><strong>Core Number:</strong> 1 (in network core layer)</li>
+                <li><strong>Constraint:</strong> 0.052632 (low constraint, free connections)</li>
+                <li><strong>Weighted Degree:</strong> 316 (total interaction frequency)</li>
+            </ul>
+
+            <h3>2. Interaction Patterns</h3>
+            <table>
+                <tr>
+                    <th>Rank</th>
+                    <th>Character</th>
+                    <th>Frequency</th>
+                    <th>Chapters</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Jia Baoyu (賈寶玉)</td>
+                    <td>59 times</td>
+                    <td>20 chapters</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Lin Daiyu (林黛玉)</td>
+                    <td>58 times</td>
+                    <td>18 chapters</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Grandmother Jia (賈母)</td>
+                    <td>30 times</td>
+                    <td>12 chapters</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Lady Wang (王夫人)</td>
+                    <td>30 times</td>
+                    <td>13 chapters</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>Shi Xiangyun (史湘雲)</td>
+                    <td>23 times</td>
+                    <td>8 chapters</td>
+                </tr>
+            </table>
+
+            <h3>3. Network Structure Characteristics</h3>
+            <ul>
+                <li><strong>Network Type:</strong> Star Network</li>
+                <li><strong>Number of Nodes:</strong> 20</li>
+                <li><strong>Number of Edges:</strong> 19</li>
+                <li><strong>Network Density:</strong> 0.0500 (relatively sparse)</li>
+                <li><strong>Reciprocity:</strong> 0.0000 (all edges are unidirectional)</li>
+                <li><strong>Transitivity:</strong> 0.0000 (no triangular structures)</li>
+                <li><strong>Connectivity:</strong> Weakly connected but not strongly connected</li>
+            </ul>
+
+            <h3>4. Character Role Analysis</h3>
+            <p><strong>Xue Baochai:</strong> Network center, proactive socializer, connecting multiple groups. All interactions are proactively initiated (out-degree=19, in-degree=0), reflecting her proactive social character.</p>
+            <p><strong>Main Interaction Partners:</strong> Most frequent interactions with Jia Baoyu and Lin Daiyu, reflecting her importance in main character relationships.</p>
+            <p><strong>Elder Interactions:</strong> Frequent interactions with Grandmother Jia and Lady Wang, reflecting traditional family relationships.</p>
+            <p><strong>Peer Interactions:</strong> Interactions with Shi Xiangyun, Tanchun and other peers, reflecting the breadth of social network.</p>
+        </section>
+
+        <!-- Visualization Results -->
+        <section class="section">
+            <h2>📈 Visualization Results</h2>
+            
+            <h3>Network Visualization</h3>
+            <div class="image-container">
+                <img src="data/results/network_visualization.png" alt="Network Visualization">
+                <p>Xue Baochai's Social Network Graph - Red node represents Xue Baochai, blue nodes represent other characters, edge thickness indicates interaction frequency</p>
+            </div>
+
+            <h3>Interaction Frequency Comparison</h3>
+            <div class="image-container">
+                <img src="data/results/centrality_comparison.png" alt="Centrality Comparison">
+                <p>Interaction Frequency Comparison with Xue Baochai - Left chart shows interaction frequency, right chart shows interaction type distribution</p>
+            </div>
+
+            <h3>Advanced Metrics Analysis</h3>
+            <div class="image-container">
+                <img src="data/results/advanced_metrics.png" alt="Advanced Metrics Visualization">
+                <p>Advanced Network Analysis Metrics - Including Katz Centrality, HITS Algorithm, Harmonic Centrality, etc.</p>
+            </div>
+        </section>
+
+        <!-- Tools and Methods -->
+        <section class="section">
+            <h2>🛠️ Tools and Methods</h2>
+            
+            <h3>Data Source</h3>
+            <ul>
+                <li><strong>ctext.org:</strong> Chinese Text Project, providing authoritative electronic text of "Dream of the Red Chamber"</li>
+            </ul>
+
+            <h3>Analysis Tools</h3>
+            <ul>
+                <li><strong>Python 3:</strong> Main programming language</li>
+                <li><strong>NetworkX:</strong> Network analysis and graph theory algorithm library</li>
+                <li><strong>Pandas:</strong> Data processing and analysis</li>
+                <li><strong>Matplotlib:</strong> Data visualization</li>
+            </ul>
+
+            <h3>Presentation Platforms</h3>
+            <ul>
+                <li><strong>Streamlit:</strong> Interactive web application framework</li>
+                <li><strong>StoryMaps:</strong> Story map presentation platform</li>
+                <li><strong>Gephi:</strong> Network visualization tool (optional)</li>
+            </ul>
+        </section>
+
+        <!-- Conclusions -->
+        <section class="section">
+            <h2>📝 Research Conclusions</h2>
+            
+            <div class="highlight-box">
+                <h3>Main Conclusions</h3>
+                <p>Through 16 diverse network analysis algorithms, we comprehensively analyzed Xue Baochai's social network characteristics in the selected 20 chapters of "Dream of the Red Chamber". Research findings:</p>
+                <ul style="margin-top: 15px;">
+                    <li>Xue Baochai is the absolute center of the network, with the highest degree centrality and Hub score</li>
+                    <li>She exhibits proactive social characteristics, with all interactions being proactively initiated</li>
+                    <li>She connects multiple different groups, including main characters, elders, peers, and maids</li>
+                    <li>The network presents a typical star structure, with Xue Baochai as the only central node</li>
+                </ul>
+            </div>
+
+            <h3>Research Significance</h3>
+            <p>This study provides data support for understanding character relationships in "Dream of the Red Chamber" through digital humanities methods. Diverse network analysis algorithms reveal Xue Baochai's social network characteristics from multiple perspectives, providing new insights and methods for literary research.</p>
+        </section>
+
+        <!-- Data and Resources -->
+        <section class="section">
+            <h2>💾 Data and Resources</h2>
+            <p>All analysis data, code, and result files have been organized, including:</p>
+            <ul>
+                <li>Original text files (20 chapters)</li>
+                <li>Cleaned text files</li>
+                <li>Interaction relationship table (CSV format)</li>
+                <li>Centrality metrics table (CSV format)</li>
+                <li>Network data file (GML format, usable in Gephi)</li>
+                <li>Visualization images (PNG format)</li>
+                <li>Python analysis scripts</li>
+            </ul>
+            <p style="margin-top: 20px;"><strong>Data Source Statement:</strong> All text data comes from <a href="https://ctext.org/hongloumeng" target="_blank">ctext.org</a>, meeting assignment requirements.</p>
+        </section>
+
+        <footer>
+            <p><strong>CHC5904 Digital Studies of Chinese Culture</strong></p>
+            <p>Assignment 2 - Option 1</p>
+            <p>Research Scope: Selected 20 Chapters of Dream of the Red Chamber | Research Subject: Xue Baochai (薛寶釵)</p>
+            <p style="margin-top: 15px; font-size: 0.9em; color: #999;">
+                This website can be used for StoryMaps or Streamlit presentation
+            </p>
+        </footer>
+    </div>
+</body>
+</html>
+
+
+

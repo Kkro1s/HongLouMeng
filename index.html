@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>红楼梦人物社交网络分析 - 薛寶釵研究</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'SimHei', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px 20px;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            color: #764ba2;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .section h2 {
+            color: #764ba2;
+            font-size: 2em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .section h3 {
+            color: #667eea;
+            font-size: 1.5em;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        .section p, .section li {
+            font-size: 1.1em;
+            line-height: 1.8;
+            margin-bottom: 10px;
+        }
+
+        .section ul {
+            margin-left: 30px;
+            margin-bottom: 20px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .highlight-box h3 {
+            color: white;
+            margin-top: 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-card .number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .label {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .algorithm-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .algorithm-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .algorithm-card h4 {
+            color: #764ba2;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .algorithm-card .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .status.effective {
+            background: #28a745;
+            color: white;
+        }
+
+        .status.limited {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .image-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .image-container p {
+            margin-top: 10px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .chapter-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .chapter-item {
+            background: #667eea;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        table th, table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        table th {
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+        }
+
+        table tr:hover {
+            background: #f5f5f5;
+        }
+
+        .workflow {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .workflow-step {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+        }
+
+        .workflow-step .step-number {
+            background: #667eea;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+
+        footer {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px;
+            margin-top: 30px;
+            color: #666;
+        }
+
+        .data-source {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #2196F3;
+            margin: 15px 0;
+        }
+
+        .data-source strong {
+            color: #2196F3;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .algorithm-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 红楼梦人物社交网络分析</h1>
+            <p>研究对象：薛寶釵 | 基于选中20章的网络分析</p>
+            <p style="font-size: 0.9em; color: #999; margin-top: 10px;">
+                CHC5904 Digital Studies of Chinese Culture - Assignment 2
+            </p>
+        </header>
+
+        <!-- 项目概览 -->
+        <section class="section">
+            <h2>📊 项目概览</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="number">20</div>
+                    <div class="label">分析章节</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">19</div>
+                    <div class="label">互动人物</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">316</div>
+                    <div class="label">总互动次数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">16</div>
+                    <div class="label">分析算法</div>
+                </div>
+            </div>
+            
+            <div class="highlight-box">
+                <h3>主要发现</h3>
+                <p>薛寶釵在社交网络中处于绝对中心地位，度中心性为1.0，Hub分数为1.0，是完美的枢纽节点。她与19个人物有直接互动，总互动次数达316次，其中与賈寶玉（59次）和林黛玉（58次）的互动最为频繁。</p>
+            </div>
+        </section>
+
+        <!-- 数据来源 -->
+        <section class="section">
+            <h2>📥 数据来源与准备过程</h2>
+            
+            <h3>1. 数据来源</h3>
+            <div class="data-source">
+                <p><strong>原始文本来源：</strong> <a href="https://ctext.org/hongloumeng" target="_blank">ctext.org</a></p>
+                <p>所有文本数据均来自中国哲学书电子化计划（ctext.org）的《红楼梦》电子文本，确保数据的权威性和准确性。</p>
+            </div>
+
+            <h3>2. 章节选择</h3>
+            <p>为了确保分析的深度和质量，我们采用了基于薛寶釵出现频率的章节选择方法：</p>
+            <ul>
+                <li><strong>分析范围：</strong> 第1-50章</li>
+                <li><strong>选择标准：</strong> 统计每章中薛寶釵的出现次数（包括所有名称变体）</li>
+                <li><strong>选择结果：</strong> 选择出现频率最高的20章</li>
+            </ul>
+
+            <h3>选中的20章</h3>
+            <div class="chapter-list">
+                <div class="chapter-item">第7章</div>
+                <div class="chapter-item">第8章</div>
+                <div class="chapter-item">第22章</div>
+                <div class="chapter-item">第25章</div>
+                <div class="chapter-item">第27章</div>
+                <div class="chapter-item">第28章</div>
+                <div class="chapter-item">第29章</div>
+                <div class="chapter-item">第30章</div>
+                <div class="chapter-item">第31章</div>
+                <div class="chapter-item">第32章</div>
+                <div class="chapter-item">第34章</div>
+                <div class="chapter-item">第35章</div>
+                <div class="chapter-item">第36章</div>
+                <div class="chapter-item">第37章</div>
+                <div class="chapter-item">第38章</div>
+                <div class="chapter-item">第42章</div>
+                <div class="chapter-item">第45章</div>
+                <div class="chapter-item">第48章</div>
+                <div class="chapter-item">第49章</div>
+                <div class="chapter-item">第50章</div>
+            </div>
+            <p style="margin-top: 15px;"><strong>总出现次数：</strong> 453次 | <strong>平均每章：</strong> 22.6次</p>
+
+            <h3>3. 数据预处理流程</h3>
+            <div class="workflow">
+                <div class="workflow-step">
+                    <div class="step-number">1</div>
+                    <div>
+                        <strong>文本清理</strong>
+                        <p>移除章节标题、统一格式、处理编码问题</p>
+                    </div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-number">2</div>
+                    <div>
+                        <strong>人物名称标准化</strong>
+                        <p>构建人物名称词典，处理别名、称谓等变体（28个人物，87个变体）</p>
+                    </div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-number">3</div>
+                    <div>
+                        <strong>互动关系识别</strong>
+                        <p>基于句子级别的共现分析，识别对话、行为、共同出现三种互动类型</p>
+                    </div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-number">4</div>
+                    <div>
+                        <strong>数据验证</strong>
+                        <p>人工细读验证，补充遗漏的互动关系，确保数据质量</p>
+                    </div>
+                </div>
+            </div>
+
+            <h3>4. 数据统计</h3>
+            <table>
+                <tr>
+                    <th>指标</th>
+                    <th>数值</th>
+                </tr>
+                <tr>
+                    <td>总字符数</td>
+                    <td>143,605字符</td>
+                </tr>
+                <tr>
+                    <td>清理后文本文件</td>
+                    <td>20个</td>
+                </tr>
+                <tr>
+                    <td>人物数量</td>
+                    <td>28个</td>
+                </tr>
+                <tr>
+                    <td>人物名称变体</td>
+                    <td>87个</td>
+                </tr>
+                <tr>
+                    <td>识别出的互动关系</td>
+                    <td>19个</td>
+                </tr>
+                <tr>
+                    <td>总互动次数</td>
+                    <td>316次</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- 网络分析算法 -->
+        <section class="section">
+            <h2>🔬 网络分析算法</h2>
+            <p>本研究使用了16种多样化的网络分析算法，从多个角度全面分析薛寶釵的社交网络特征。</p>
+
+            <h3>基础中心性算法（8种）</h3>
+            <div class="algorithm-grid">
+                <div class="algorithm-card">
+                    <h4>1. 度中心性 (Degree Centrality)</h4>
+                    <p>衡量节点直接连接的数量。薛寶釵的度中心性为1.0，是所有人物中最高的。</p>
+                    <span class="status effective">高度有效</span>
+                </div>
+                <div class="algorithm-card">
+                    <h4>2. 入度/出度 (In/Out-degree)</h4>
+                    <p>分析节点的主动/被动角色。薛寶釵出度=19，入度=0，体现主动社交特点。</p>
+                    <span class="status effective">高度有效</span>
+                </div>
+                <div class="algorithm-card">
+                    <h4>3. 加权度 (Weighted Degree)</h4>
+                    <p>考虑互动频率的度数。薛寶釵的加权度为316，反映互动强度。</p>
+                    <span class="status effective">高度有效</span>
+                </div>
+                <div class="algorithm-card">
+                    <h4>4. 介数中心性 (Betweenness)</h4>
+                    <p>衡量节点作为"桥梁"的重要性。由于星形网络结构，值为0。</p>
+                    <span class="status limited">结构限制</span>
+                </div>
+                <div class="algorithm-card">
+                    <h4>5. 接近中心性 (Closeness)</h4>
+                    <p>衡量节点到其他节点的平均距离。受有向星形结构限制。</p>
+                    <span class="status limited">结构限制</span>
+                </div>
+                <div class="algorithm-card">
+                    <h4>6. 特征向量中心性</h4>
+                    <p>考虑连接对象重要性的中心性。网络结构简单，区分度不高。</p>
+                    <span class="status limited">结构限制</span>
+                </div>
+                <div class="algorithm-card">
+                    <h4>7. PageRank</h4>
+                    <p>Google搜索引擎算法，衡量节点重要性。薛寶釵值为0.0480。</p>
+                    <span class="status effective">中等有效</span>
+                </div>
+                <div class="algorithm-card">
+                    <h4>8. 聚类系数</h4>
+                    <p>衡量邻居之间的连接密度。星形结构无聚类，值为0。</p>
+                    <span class="status limited">结构限制</span>
+                </div>
+            </div>
+
+            <h3>高级算法（8种）</h3>
+            <div class="algorithm-grid">
+                <div class="algorithm-card">
+                    <h4>9. Katz中心性</h4>
+                    <p>考虑所有路径的中心性。薛寶釵值为0.517527，确认中心地位。</p>
+                    <span class="status effective">高度有效</span>
+                </div>
+                <div class="algorithm-card">
+                    <h4>10. 调和中心性</h4>
+                    <p>使用调和平均的距离中心性。受网络结构限制。</p>
+                    <span class="status limited">结构限制</span>
+                </div>
+                <div class="algorithm-card">
+                    <h4>11. HITS算法</h4>
+                    <p>区分Hub和Authority。薛寶釵Hub分数1.0，是完美枢纽节点。</p>
+                    <span class="status effective">高度有效</span>
+                </div>
+                <div class="algorithm-card">
+                    <h4>12. 子图中心性</h4>
+                    <p>基于节点参与的子图数量。薛寶釵值为39.09，反映局部重要性。</p>
+                    <span class="status effective">高度有效</span>
+                </div>
+                <div class="algorithm-card">
+                    <h4>13. 核心-边缘分析</h4>
+                    <p>识别网络的核心和边缘节点。薛寶釵核心数为1，处于核心层。</p>
+                    <span class="status effective">高度有效</span>
+                </div>
+                <div class="algorithm-card">
+                    <h4>14. 结构洞分析</h4>
+                    <p>分析节点的信息控制能力。薛寶釵约束度0.052632，连接自由。</p>
+                    <span class="status effective">高度有效</span>
+                </div>
+                <div class="algorithm-card">
+                    <h4>15. 社区检测</h4>
+                    <p>识别网络中的社区结构。由于星形结构，所有节点在同一社区。</p>
+                    <span class="status limited">结构限制</span>
+                </div>
+                <div class="algorithm-card">
+                    <h4>16. 网络属性分析</h4>
+                    <p>分析网络整体特征（密度、互惠性、传递性等）。</p>
+                    <span class="status effective">高度有效</span>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <h3>算法有效性总结</h3>
+                <p><strong>高度有效（9种）：</strong> 度中心性、入度/出度、加权度、Katz中心性、HITS、子图中心性、核心-边缘、结构洞、网络属性</p>
+                <p><strong>中等有效（1种）：</strong> PageRank</p>
+                <p><strong>受网络结构限制（6种）：</strong> 介数中心性、接近中心性、特征向量中心性、聚类系数、调和中心性、社区检测</p>
+            </div>
+        </section>
+
+        <!-- 主要发现 -->
+        <section class="section">
+            <h2>🔍 主要发现</h2>
+            
+            <h3>1. 薛寶釵的网络地位</h3>
+            <ul>
+                <li><strong>度中心性：</strong> 1.0000（最高，19个直接连接）</li>
+                <li><strong>Hub分数：</strong> 1.0000（完美枢纽节点）</li>
+                <li><strong>核心数：</strong> 1（处于网络核心层）</li>
+                <li><strong>约束度：</strong> 0.052632（低约束，连接自由）</li>
+                <li><strong>加权度：</strong> 316（总互动频率）</li>
+            </ul>
+
+            <h3>2. 互动模式</h3>
+            <table>
+                <tr>
+                    <th>排名</th>
+                    <th>人物</th>
+                    <th>互动次数</th>
+                    <th>出现章节数</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>賈寶玉</td>
+                    <td>59次</td>
+                    <td>20章</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>林黛玉</td>
+                    <td>58次</td>
+                    <td>18章</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>賈母</td>
+                    <td>30次</td>
+                    <td>12章</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>王夫人</td>
+                    <td>30次</td>
+                    <td>13章</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>史湘雲</td>
+                    <td>23次</td>
+                    <td>8章</td>
+                </tr>
+            </table>
+
+            <h3>3. 网络结构特征</h3>
+            <ul>
+                <li><strong>网络类型：</strong> 星形网络（Star Network）</li>
+                <li><strong>节点数：</strong> 20个</li>
+                <li><strong>边数：</strong> 19条</li>
+                <li><strong>网络密度：</strong> 0.0500（相对稀疏）</li>
+                <li><strong>互惠性：</strong> 0.0000（所有边都是单向的）</li>
+                <li><strong>传递性：</strong> 0.0000（没有三角形结构）</li>
+                <li><strong>连通性：</strong> 弱连通但非强连通</li>
+            </ul>
+
+            <h3>4. 人物角色分析</h3>
+            <p><strong>薛寶釵：</strong> 网络中心，主动社交者，连接多个群体。所有互动都是主动发起（出度=19，入度=0），体现了其主动社交的性格特点。</p>
+            <p><strong>主要互动对象：</strong> 与賈寶玉和林黛玉的互动最频繁，体现了她在主要人物关系中的重要性。</p>
+            <p><strong>长辈互动：</strong> 与賈母、王夫人等长辈有较多互动，体现了传统家庭关系。</p>
+            <p><strong>同辈互动：</strong> 与史湘雲、探春等同辈有互动，体现了社交网络的广度。</p>
+        </section>
+
+        <!-- 可视化结果 -->
+        <section class="section">
+            <h2>📈 可视化结果</h2>
+            
+            <h3>网络可视化</h3>
+            <div class="image-container">
+                <img src="data/results/network_visualization.png" alt="网络可视化图">
+                <p>薛寶釵社交网络图 - 红色节点为薛寶釵，蓝色节点为其他人物，边的粗细表示互动频率</p>
+            </div>
+
+            <h3>互动频率对比</h3>
+            <div class="image-container">
+                <img src="data/results/centrality_comparison.png" alt="中心性对比图">
+                <p>与薛寶釵的互动频率对比 - 左图显示互动频率，右图显示互动类型分布</p>
+            </div>
+
+            <h3>高级指标分析</h3>
+            <div class="image-container">
+                <img src="data/results/advanced_metrics.png" alt="高级指标可视化">
+                <p>高级网络分析指标 - 包括Katz中心性、HITS算法、调和中心性等</p>
+            </div>
+        </section>
+
+        <!-- 工具与方法 -->
+        <section class="section">
+            <h2>🛠️ 使用的工具与方法</h2>
+            
+            <h3>数据来源</h3>
+            <ul>
+                <li><strong>ctext.org：</strong> 中国哲学书电子化计划，提供权威的《红楼梦》电子文本</li>
+            </ul>
+
+            <h3>分析工具</h3>
+            <ul>
+                <li><strong>Python 3：</strong> 主要编程语言</li>
+                <li><strong>NetworkX：</strong> 网络分析和图论算法库</li>
+                <li><strong>Pandas：</strong> 数据处理和分析</li>
+                <li><strong>Matplotlib：</strong> 数据可视化</li>
+            </ul>
+
+            <h3>展示平台</h3>
+            <ul>
+                <li><strong>Streamlit：</strong> 交互式Web应用框架</li>
+                <li><strong>StoryMaps：</strong> 故事地图展示平台</li>
+                <li><strong>Gephi：</strong> 网络可视化工具（可选）</li>
+            </ul>
+        </section>
+
+        <!-- 结论 -->
+        <section class="section">
+            <h2>📝 研究结论</h2>
+            
+            <div class="highlight-box">
+                <h3>主要结论</h3>
+                <p>通过16种多样化的网络分析算法，我们全面分析了薛寶釵在《红楼梦》选中20章中的社交网络特征。研究发现：</p>
+                <ul style="margin-top: 15px;">
+                    <li>薛寶釵是网络的绝对中心，度中心性和Hub分数均为最高</li>
+                    <li>她具有主动社交的性格特点，所有互动都是主动发起</li>
+                    <li>她连接了多个不同群体，包括主要人物、长辈、同辈和丫鬟</li>
+                    <li>网络呈现典型的星形结构，薛寶釵是唯一的中心节点</li>
+                </ul>
+            </div>
+
+            <h3>研究意义</h3>
+            <p>本研究通过数字人文方法，为理解《红楼梦》中人物关系提供了数据支持。多样化的网络分析算法从多个角度揭示了薛寶釵的社交网络特征，为文学研究提供了新的视角和方法。</p>
+        </section>
+
+        <!-- 数据下载 -->
+        <section class="section">
+            <h2>💾 数据与资源</h2>
+            <p>所有分析数据、代码和结果文件已整理完毕，包括：</p>
+            <ul>
+                <li>原始文本文件（20章）</li>
+                <li>清理后的文本文件</li>
+                <li>互动关系表（CSV格式）</li>
+                <li>中心性指标表（CSV格式）</li>
+                <li>网络数据文件（GML格式，可用于Gephi）</li>
+                <li>可视化图片（PNG格式）</li>
+                <li>Python分析脚本</li>
+            </ul>
+            <p style="margin-top: 20px;"><strong>数据来源声明：</strong> 所有文本数据来自 <a href="https://ctext.org/hongloumeng" target="_blank">ctext.org</a>，符合作业要求。</p>
+        </section>
+
+        <footer>
+            <p><strong>CHC5904 Digital Studies of Chinese Culture</strong></p>
+            <p>Assignment 2 - Option 1</p>
+            <p>研究范围：红楼梦选中20章 | 研究对象：薛寶釵</p>
+            <p style="margin-top: 15px; font-size: 0.9em; color: #999;">
+                本网站可用于StoryMaps或Streamlit展示
+            </p>
+        </footer>
+    </div>
+</body>
+</html>
+
+
+

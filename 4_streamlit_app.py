@@ -63,24 +63,42 @@ def load_data():
 
 def create_interactive_network(G, target_char):
     """Create interactive network graph (using pyvis)"""
-    net = Network(height="600px", width="100%", bgcolor="#222222", font_color="white")
+    # Use CDN for better compatibility in Streamlit
+    net = Network(
+        height="600px", 
+        width="100%", 
+        bgcolor="#ffffff",  # Changed to white background for better visibility
+        font_color="black",  # Changed to black text for better visibility
+        cdn_resources="remote"  # Use CDN instead of local files
+    )
     net.set_options("""
     {
       "nodes": {
-        "font": {"size": 14},
-        "scaling": {"min": 10, "max": 30}
+        "font": {"size": 14, "color": "black"},
+        "scaling": {"min": 10, "max": 30},
+        "borderWidth": 2,
+        "borderColor": "#2B7CE9"
       },
       "edges": {
-        "arrows": {"to": {"enabled": true}},
-        "smooth": {"type": "continuous"}
+        "arrows": {"to": {"enabled": true, "scaleFactor": 1.2}},
+        "smooth": {"type": "continuous"},
+        "color": {"color": "#848484", "highlight": "#848484"}
       },
       "physics": {
+        "enabled": true,
         "barnesHut": {
           "gravitationalConstant": -2000,
           "centralGravity": 0.1,
           "springLength": 200,
-          "springConstant": 0.04
-        }
+          "springConstant": 0.04,
+          "damping": 0.09
+        },
+        "stabilization": {"iterations": 100}
+      },
+      "interaction": {
+        "hover": true,
+        "tooltipDelay": 200,
+        "hideEdgesOnDrag": false
       }
     }
     """)
@@ -88,7 +106,8 @@ def create_interactive_network(G, target_char):
     # Add nodes
     for node in G.nodes():
         if node == target_char:
-            net.add_node(node, label=node, color="#ff0000", size=30, title=f"{node}<br>Target Character")
+            net.add_node(node, label=node, color="#ff0000", size=30, 
+                        title=f"{node}<br>Target Character<br>Degree: {G.degree(node)}")
         else:
             degree = G.degree(node)
             net.add_node(node, label=node, color="#87CEEB", size=10 + degree * 2, 
@@ -105,8 +124,19 @@ def main():
     # Title
     st.title("📚 Xue Baochai Social Network Analysis")
     st.markdown("---")
-    st.markdown("**Research Scope:** Dream of the Red Chamber Chapters 10-20")
-    st.markdown("**Research Subject:** Xue Baochai (薛寶釵)")
+    
+    # Load selected chapters info
+    try:
+        with open(os.path.join(OUTPUT_DIR, "selected_chapters.json"), 'r', encoding='utf-8') as f:
+            chapters_info = json.load(f)
+        selected_chapters = chapters_info['selected_chapters']
+        chapters_str = ", ".join(map(str, selected_chapters))
+        st.markdown(f"**Research Scope:** 20 selected chapters from Dream of the Red Chamber (Chapters 1-50)")
+        st.markdown(f"**Selected Chapters:** {chapters_str}")
+        st.markdown("**Research Subject:** Xue Baochai (薛寶釵)")
+    except:
+        st.markdown("**Research Scope:** 20 selected chapters from Dream of the Red Chamber (Chapters 1-50)")
+        st.markdown("**Research Subject:** Xue Baochai (薛寶釵)")
     
     # Load data
     try:
@@ -194,16 +224,63 @@ def main():
                 # Create interactive network
                 net = create_interactive_network(G, TARGET_CHARACTER)
                 
-                # Save as HTML and display
+                # Save HTML file
                 html_file = os.path.join(RESULTS_DIR, "interactive_network.html")
                 net.save_graph(html_file)
                 
-                with open(html_file, 'r', encoding='utf-8') as f:
-                    html_content = f.read()
+                # Get absolute path
+                abs_html_path = os.path.abspath(html_file)
                 
-                st.components.v1.html(html_content, height=700)
+                # Provide download button and direct link
+                st.info("💡 **Note**: For best experience, please open the interactive network graph in a new browser tab.")
+                
+                col1, col2 = st.columns(2)
+                with col1:
+                    # Read HTML file for download
+                    with open(html_file, 'r', encoding='utf-8') as f:
+                        html_content = f.read()
+                    st.download_button(
+                        label="📥 Download Interactive Network Graph",
+                        data=html_content,
+                        file_name="interactive_network.html",
+                        mime="text/html"
+                    )
+                
+                with col2:
+                    # Try to display in Streamlit (may not work perfectly)
+                    st.markdown(f"""
+                    <a href="file://{abs_html_path}" target="_blank" style="
+                        display: inline-block;
+                        padding: 10px 20px;
+                        background-color: #FF4B4B;
+                        color: white;
+                        text-decoration: none;
+                        border-radius: 5px;
+                        font-weight: bold;
+                    ">🔗 Open in New Tab</a>
+                    """, unsafe_allow_html=True)
+                
+                st.markdown("---")
+                st.markdown("**Preview (embedded view - may have limitations):**")
+                
+                # Try to display in Streamlit with improved HTML
+                html_str = net.generate_html()
+                
+                # Ensure HTML is properly formatted for Streamlit
+                # Add a wrapper div to ensure proper rendering
+                html_wrapped = f"""
+                <div style="width: 100%; height: 700px; overflow: hidden;">
+                {html_str}
+                </div>
+                """
+                
+                st.components.v1.html(html_wrapped, height=700, scrolling=False)
+                
             except Exception as e:
                 st.error(f"Error creating interactive network: {e}")
+                import traceback
+                with st.expander("Error Details (click to view)"):
+                    st.code(traceback.format_exc())
                 st.info("Falling back to static network graph.")
                 st.markdown("Below is the static network graph:")
         else:
@@ -239,42 +316,117 @@ def main():
     elif page == "Centrality Analysis":
         st.header("📊 Centrality Analysis")
         
-        st.markdown("### Degree Centrality Comparison")
+        st.markdown("### Interaction Frequency Comparison")
+        st.markdown("*Shows the frequency of interactions with Xue Baochai (薛寶釵)*")
         
-        # Degree centrality chart
-        df_sorted = df_metrics.sort_values('degree', ascending=False)
+        # Use interaction frequency instead of degree for comparison
+        # Merge interaction data with metrics to get frequency
+        df_with_freq = df_metrics.merge(
+            df_interactions[['Target', 'Frequency']].rename(columns={'Target': 'character'}),
+            on='character',
+            how='left'
+        )
+        # For Xue Baochai, use weighted_degree as total frequency
+        df_with_freq.loc[df_with_freq['character'] == TARGET_CHARACTER, 'Frequency'] = \
+            df_with_freq.loc[df_with_freq['character'] == TARGET_CHARACTER, 'weighted_degree']
+        # Fill NaN with 0
+        df_with_freq['Frequency'] = df_with_freq['Frequency'].fillna(0)
+        
+        # Sort by frequency (excluding Xue Baochai for comparison chart)
+        df_others = df_with_freq[df_with_freq['character'] != TARGET_CHARACTER].copy()
+        df_sorted = df_others.sort_values('Frequency', ascending=False)
         
         fig, ax = plt.subplots(figsize=(12, 8))
-        colors = ['red' if char == TARGET_CHARACTER else 'lightblue' 
-                 for char in df_sorted['character']]
-        bars = ax.barh(range(len(df_sorted)), df_sorted['degree'], color=colors, alpha=0.7)
+        colors = ['#FF6B6B' if freq >= 20 else '#4ECDC4' if freq >= 10 else '#95E1D3' 
+                 for freq in df_sorted['Frequency']]
+        bars = ax.barh(range(len(df_sorted)), df_sorted['Frequency'], color=colors, alpha=0.8)
         ax.set_yticks(range(len(df_sorted)))
         ax.set_yticklabels(df_sorted['character'], fontsize=10)
-        ax.set_xlabel('Degree Centrality', fontsize=12)
-        ax.set_title('Character Degree Centrality Comparison', fontsize=14)
+        ax.set_xlabel('Interaction Frequency (times)', fontsize=12)
+        ax.set_title('Interaction Frequency with Xue Baochai', fontsize=14)
         ax.grid(axis='x', alpha=0.3)
         
-        for i, (char, degree) in enumerate(zip(df_sorted['character'], df_sorted['degree'])):
-            ax.text(degree + 0.1, i, str(int(degree)), va='center', fontsize=9)
+        for i, (char, freq) in enumerate(zip(df_sorted['character'], df_sorted['Frequency'])):
+            ax.text(freq + 1, i, str(int(freq)), va='center', fontsize=9)
         
         plt.tight_layout()
         st.pyplot(fig)
+        
+        # Show Xue Baochai's total interactions separately
+        xue_total = df_with_freq[df_with_freq['character'] == TARGET_CHARACTER]['Frequency'].values[0]
+        st.info(f"**Xue Baochai (薛寶釵) Total Interactions:** {int(xue_total)} times with {len(df_others)} characters")
         
         st.markdown("---")
         
         # Centrality metrics table
         st.markdown("### Detailed Centrality Metrics")
-        display_cols = ['character', 'degree', 'in_degree', 'out_degree', 'weighted_degree']
-        if 'degree_centrality' in df_metrics.columns:
+        
+        # Merge with interaction frequency data
+        df_display = df_metrics.merge(
+            df_interactions[['Target', 'Frequency']].rename(columns={'Target': 'character'}),
+            on='character',
+            how='left'
+        )
+        # For Xue Baochai, use weighted_degree as total frequency
+        df_display.loc[df_display['character'] == TARGET_CHARACTER, 'Frequency'] = \
+            df_display.loc[df_display['character'] == TARGET_CHARACTER, 'weighted_degree']
+        df_display['Frequency'] = df_display['Frequency'].fillna(0).astype(int)
+        
+        # Select columns to display (prioritize meaningful metrics)
+        display_cols = ['character', 'Frequency', 'degree', 'in_degree', 'out_degree']
+        if 'degree_centrality' in df_display.columns:
             display_cols.extend(['degree_centrality', 'betweenness_centrality', 'closeness_centrality'])
         
-        df_display = df_metrics[display_cols].copy()
-        df_display.columns = ['Character', 'Degree', 'In-Degree', 'Out-Degree', 'Weighted Degree', 
-                              'Degree Centrality', 'Betweenness Centrality', 'Closeness Centrality'] if len(display_cols) > 5 else \
-                           ['Character', 'Degree', 'In-Degree', 'Out-Degree', 'Weighted Degree']
+        df_display = df_display[display_cols].copy()
         
-        st.dataframe(df_display.style.highlight_max(axis=0, subset=df_display.columns[1:]), 
-                    use_container_width=True)
+        # Sort by frequency (descending)
+        df_display = df_display.sort_values('Frequency', ascending=False)
+        
+        # Rename columns for display
+        column_mapping = {
+            'character': 'Character',
+            'Frequency': 'Interaction Frequency',
+            'degree': 'Degree',
+            'in_degree': 'In-Degree',
+            'out_degree': 'Out-Degree',
+            'degree_centrality': 'Degree Centrality',
+            'betweenness_centrality': 'Betweenness Centrality',
+            'closeness_centrality': 'Closeness Centrality'
+        }
+        df_display.columns = [column_mapping.get(col, col) for col in df_display.columns]
+        
+        # Format the dataframe for better display
+        styled_df = df_display.style.format({
+            'Interaction Frequency': '{:.0f}',
+            'Degree': '{:.0f}',
+            'In-Degree': '{:.0f}',
+            'Out-Degree': '{:.0f}',
+            'Degree Centrality': '{:.4f}',
+            'Betweenness Centrality': '{:.4f}',
+            'Closeness Centrality': '{:.4f}'
+        })
+        
+        # Highlight maximum values (excluding Character column)
+        numeric_cols = [col for col in df_display.columns if col != 'Character']
+        styled_df = styled_df.highlight_max(axis=0, subset=numeric_cols, color='#ffcccc')
+        
+        st.dataframe(styled_df, use_container_width=True, height=400)
+        
+        # Add explanation
+        st.markdown("""
+        <div style='background-color: #f0f2f6; padding: 15px; border-radius: 5px; margin-top: 10px;'>
+        <strong>Note:</strong>
+        <ul style='margin: 5px 0; padding-left: 20px;'>
+            <li><strong>Interaction Frequency</strong>: Number of interactions with Xue Baochai (most meaningful metric for this network)</li>
+            <li><strong>Degree</strong>: Number of connections (all characters except Xue Baochai have degree=1 in this star network)</li>
+            <li><strong>In-Degree</strong>: Number of incoming connections (all characters except Xue Baochai have in-degree=1)</li>
+            <li><strong>Out-Degree</strong>: Number of outgoing connections (only Xue Baochai has out-degree>0)</li>
+            <li><strong>Degree Centrality</strong>: Normalized degree centrality (0-1 scale)</li>
+            <li><strong>Betweenness Centrality</strong>: Measures how often a node appears on shortest paths</li>
+            <li><strong>Closeness Centrality</strong>: Measures average distance to all other nodes</li>
+        </ul>
+        </div>
+        """, unsafe_allow_html=True)
     
     elif page == "Interaction Details":
         st.header("📝 Interaction Details")
@@ -381,9 +533,19 @@ def main():
     
     # Footer
     st.markdown("---")
-    st.markdown("""
+    # Footer with correct research scope
+    try:
+        with open(os.path.join(OUTPUT_DIR, "selected_chapters.json"), 'r', encoding='utf-8') as f:
+            chapters_info = json.load(f)
+        selected_chapters = chapters_info['selected_chapters']
+        chapters_str = ", ".join(map(str, selected_chapters))
+        footer_text = f"Dream of the Red Chamber Character Social Network Analysis | Data Source: ctext.org | Research Scope: 20 selected chapters from Chapters 1-50 ({chapters_str})"
+    except:
+        footer_text = "Dream of the Red Chamber Character Social Network Analysis | Data Source: ctext.org | Research Scope: 20 selected chapters from Chapters 1-50"
+    
+    st.markdown(f"""
     <div style='text-align: center; color: gray;'>
-    <p>Dream of the Red Chamber Character Social Network Analysis | Data Source: ctext.org | Research Scope: Chapters 10-20</p>
+    <p>{footer_text}</p>
     </div>
     """, unsafe_allow_html=True)
 

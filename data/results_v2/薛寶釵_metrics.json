@@ -1,0 +1,12 @@
+{
+  "degree_centrality": 1.0,
+  "in_degree": 0,
+  "out_degree": 19,
+  "total_degree": 19,
+  "weighted_degree": 316,
+  "betweenness_centrality": 0.0,
+  "closeness_centrality": 0.0,
+  "eigenvector_centrality": 0.00011770941815962072,
+  "pagerank": 0.04796163734570314,
+  "clustering_coefficient": 0
+}
